@@ -10,7 +10,7 @@ module ExpensesTracker
     let(:ledger) { instance_double('ExpensesTracker::Ledger') }
 
     describe 'POST /expenses' do
-      context 'when the expense is successfully recorded' do
+      context 'when the expense is successfully recorded from JSON' do
         let(:expense) { {'some' => 'data'} }
         before do
           allow(ledger).to receive(:record).with(expense)
@@ -31,6 +31,27 @@ module ExpensesTracker
         end
       end
 
+      context 'when the expense is successfully recorded from XML' do
+        let(:expense) { "<payee>BO</payee><amount>10</amount><date>2017-06-10</date>" }
+        before do
+          allow(ledger).to receive(:record).with(expense)
+          .and_return(RecordResult.new(true, 417, nil))
+        end
+
+        it 'returns the expense id'do
+          post '/expenses', JSON.generate(expense),
+          headers: { 'Content-Type' => 'text/xml' }
+          parsed = JSON.parse(last_response.body)
+          expect(parsed).to include('expense_id' => 417)
+        end
+
+        it 'responnds with 200' do
+          post '/expenses', JSON.generate(expense),
+          headers: { 'Content-Type' => 'text/xml' }
+          expect(last_response.status).to eq(200)
+        end
+      end
+
       context 'whe the expense fails validation' do
         let(:expense) { { 'some' => 'data' } }
 
@@ -47,7 +68,6 @@ module ExpensesTracker
         end
 
         it 'responds with a 422 (Unoprocessed entry)' do
-
           post '/expenses', JSON.generate(expense),
           headers: { 'Content-Type' => 'application/json' }
           expect(last_response.status).to eq(422)
@@ -63,13 +83,11 @@ module ExpensesTracker
         .and_return(['expense_one', 'expense_two'])
       end
         it 'returns the expense record as JSON' do
-
           get '/expenses/2017-06-12', headers: { 'Content-Type' => 'application/json' }
           expenses = JSON.parse(last_response.body)
           expect(expenses).to eq(['expense_one', 'expense_two'])
         end
         it 'responses with a 200' do
-
           get '/expenses/2017-06-12', headers: { 'Content-Type' => 'application/json' }
           expect(last_response.status).to eq(200)
         end
@@ -82,13 +100,11 @@ module ExpensesTracker
           .and_return([])
         end
         it 'returns empty array as JSON' do
-
           get '/expenses/2017-06-12', headers: { 'Content-Type' => 'application/json' }
           expenses = JSON.parse(last_response.body)
           expect(expenses).to eq([])
         end
         it 'responds with a 200' do
-
           get '/expenses/2017-06-12', headers: { 'Content-Type' => 'application/json' }
           expect(last_response.status).to eq(200)
         end
