@@ -11,8 +11,8 @@ module ExpensesTracker
       super()
     end
 
-    post '/expenses' do
-      if request.content_type == 'text/xml'
+    post '/expenses', :provides => [:json, :xml] do
+      if request.media_type == 'text/xml'
         xml_expense = Ox.load(request.body.read, mode: :hash)
         expense = JSON.parse(xml_expense.to_json)
       else
