@@ -13,11 +13,11 @@ module ExpensesTracker
 
     post '/expenses' do
       if request.content_type == 'text/xml'
-        xml = request.body.read
-        xml_expense = Ox.load(xml, mode: :hash)
-        expense = JSON.parse(xml_expense)
+        xml_expense = Ox.load(request.body.read, mode: :hash)
+        expense = JSON.parse(xml_expense.to_json)
       else
         expense = JSON.parse(request.body.read)
+      end
         result = @ledger.record(expense)
         if result.success?
           JSON.generate('expense_id' => result.expense_id)
@@ -26,7 +26,7 @@ module ExpensesTracker
           JSON.generate('error' => result.error_message)
         end
       end
-    end
+
 
     get '/expenses/:date' do
       JSON.generate(@ledger.expenses_on(params[:date]))
