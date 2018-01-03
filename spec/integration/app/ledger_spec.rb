@@ -20,10 +20,11 @@ module ExpensesTracker
           expect(result).to be_success
           expect(DB[:expenses].all).to match [a_hash_including(id: result.expense_id,
             payee: 'Starbucks',
-             amount: 5.75,
-             date: Date.iso8601('2017-06-10'))]
+            amount: 5.75,
+            date: Date.iso8601('2017-06-10'))]
         end
       end
+
       context 'when expense lacks payee' do
         it 'rejects the expense as invalid' do
           expense.delete('payee')

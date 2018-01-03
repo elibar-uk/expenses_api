@@ -2,7 +2,6 @@ require 'sinatra/base'
 require 'json'
 require 'ox'
 require_relative 'ledger'
-require 'pry'
 
 module ExpensesTracker
   class API < Sinatra::Base
