@@ -7,7 +7,8 @@ module ExpensesTracker
       include Rack::Test::Methods
 
       def post_expense(expense)
-        post '/expenses', JSON.generate(expense)
+        post '/expenses', JSON.generate(expense),
+        headers: { 'Content-Type' => 'application/json' }
         expect(last_response.status).to eq(200)
 
         parsed = JSON.parse(last_response.body)
@@ -31,7 +32,8 @@ module ExpensesTracker
         'amount' => 95.75,
         'date' => '2017-06-11'
         )
-        get '/expenses/2017-06-10'
+
+        get '/expenses/2017-06-10', headers: { 'Content-Type' => 'application/json' }
         expect(last_response.status).to eq(200)
 
         expenses = JSON.parse(last_response.body)

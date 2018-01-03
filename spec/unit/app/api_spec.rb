@@ -1,8 +1,6 @@
 require_relative '../../../app/api'
 
 module ExpensesTracker
-  # RecordResult = Struct.new(:success?, :expense_id, :error_message)
-
   RSpec.describe API do
     include Rack::Test::Methods
 
@@ -20,13 +18,15 @@ module ExpensesTracker
         end
 
         it 'returns the expense id'do
-          post '/expenses', JSON.generate(expense)
+          post '/expenses', JSON.generate(expense),
+          headers: { 'Content-Type' => 'application/json' }
           parsed = JSON.parse(last_response.body)
           expect(parsed).to include('expense_id' => 417)
         end
 
         it 'responnds with 200' do
-          post '/expenses', JSON.generate(expense)
+          post '/expenses', JSON.generate(expense),
+          headers: { 'Content-Type' => 'application/json' }
           expect(last_response.status).to eq(200)
         end
       end
@@ -40,14 +40,16 @@ module ExpensesTracker
             .and_return(RecordResult.new(false, 417, 'Expense incomplete'))
         end
         it 'returns an error message' do
-          post '/expenses', JSON.generate(expense)
-
+          post '/expenses', JSON.generate(expense),
+          headers: { 'Content-Type' => 'application/json' }
           parsed = JSON.parse(last_response.body)
           expect(parsed).to include('error' => 'Expense incomplete')
         end
 
         it 'responds with a 422 (Unoprocessed entry)' do
-          post '/expenses', JSON.generate(expense)
+
+          post '/expenses', JSON.generate(expense),
+          headers: { 'Content-Type' => 'application/json' }
           expect(last_response.status).to eq(422)
         end
       end
@@ -61,12 +63,14 @@ module ExpensesTracker
         .and_return(['expense_one', 'expense_two'])
       end
         it 'returns the expense record as JSON' do
-          get '/expenses/2017-06-12'
+
+          get '/expenses/2017-06-12', headers: { 'Content-Type' => 'application/json' }
           expenses = JSON.parse(last_response.body)
           expect(expenses).to eq(['expense_one', 'expense_two'])
         end
         it 'responses with a 200' do
-          get '/expenses/2017-06-12'
+
+          get '/expenses/2017-06-12', headers: { 'Content-Type' => 'application/json' }
           expect(last_response.status).to eq(200)
         end
       end
@@ -78,12 +82,14 @@ module ExpensesTracker
           .and_return([])
         end
         it 'returns empty array as JSON' do
-          get '/expenses/2017-06-12'
+
+          get '/expenses/2017-06-12', headers: { 'Content-Type' => 'application/json' }
           expenses = JSON.parse(last_response.body)
           expect(expenses).to eq([])
         end
         it 'responds with a 200' do
-          get '/expenses/2017-06-12'
+
+          get '/expenses/2017-06-12', headers: { 'Content-Type' => 'application/json' }
           expect(last_response.status).to eq(200)
         end
       end

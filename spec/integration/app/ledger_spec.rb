@@ -31,7 +31,29 @@ module ExpensesTracker
 
           expect(result).not_to be_success
           expect(result.expense_id).to eq(nil)
-          expect(result.error_message).to include('payee missing')
+          expect(result.error_message).to include('data missing')
+          expect(DB[:expenses].count).to eq(0)
+        end
+      end
+      context 'when expense lacks payee' do
+        it 'rejects the expense as invalid' do
+          expense.delete('amount')
+          result = ledger.record(expense)
+
+          expect(result).not_to be_success
+          expect(result.expense_id).to eq(nil)
+          expect(result.error_message).to include('data missing')
+          expect(DB[:expenses].count).to eq(0)
+        end
+      end
+      context 'when expense lacks payee' do
+        it 'rejects the expense as invalid' do
+          expense.delete('date')
+          result = ledger.record(expense)
+
+          expect(result).not_to be_success
+          expect(result.expense_id).to eq(nil)
+          expect(result.error_message).to include('data missing')
           expect(DB[:expenses].count).to eq(0)
         end
       end

@@ -4,8 +4,8 @@ module ExpensesTracker
 
   class Ledger
     def record(expense)
-      unless expense.key?('payee')
-        message = 'payee missing'
+      unless expense.key?('payee') && expense.key?('date') && expense.key?('amount')
+        message = 'data missing'
         return  RecordResult.new(false, nil, message)
       end
       DB[:expenses].insert(expense)
